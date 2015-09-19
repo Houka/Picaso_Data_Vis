@@ -56,6 +56,7 @@
 		    			if (y+h > canvas.height){
 		    				y = y-h;
 		    			}
+		    			context.globalCompositeOperation = 'xor';
 			    		context.drawImage(img, x,y,w,h);
 		    		};
 
