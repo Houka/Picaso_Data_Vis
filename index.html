@@ -20,28 +20,60 @@
 			var delay = 1000/60; //millisecs
 			var timer = setTimeout(update, delay);
 			//others
+			//mouse vars
+			var mousex=0, mousey=0;
+			var mouseclicks = 0;
+			var mouseclicked = false;
+			var mouseon = false;
+			var lastmousex=0, lastmousey=0;
+
+			var keypressed = false;
 			//initalize canvas window width to be starting window width
 			canvas.width = window.innerWidth - 20;
 			canvas.height = window.innerHeight - 20;
 			
+
 			//draw 
 			function draw(){
 				//draw your things here
+	
+				context.clear();
+				for (i = 0; i < 12; i++) { 
 
-				//example of a rectangle drawing
-				context.fillStyle="#FF1231"
-				context.fillRect(20,20,150,300)
+		    		//how to load an image from url
+		    		var img = new Image();
+		    		img.onload = function (){
+					    var x = parseInt(Math.random()*canvas.width);
+					    var y = parseInt(Math.random()*canvas.height);
+					    var rand = Math.random();
+					    var h =  parseInt(rand*img.height);
+					    var w =  parseInt(rand*img.width);
+		    			context.globalAlpha=rand;
+
+		    			if (x+w > canvas.width){
+		    				x = x-w;
+		    			}
+		    			if (y+h > canvas.height){
+		    				y = y-h;
+		    			}
+			    		context.drawImage(img, x,y,w,h);
+		    		};
+
+		    		img.src = "images/cow.png";
+				}
+
 
 			};
 
 			//game loop
 			function update () {
 				//test
-				/*context.clear();
-				x++;
+				/*x++;
 				context.fillText("timer: "+x,10,10);
 				*/
-				draw();
+				if (keypressed){
+					draw();
+				}
 
 				//repeat or loop
 				timer = setTimeout(update, delay);
@@ -87,9 +119,11 @@
 
 			// capture user input
 			//*****Keyboard Events********//
-			/*
+			
 			document.onkeydown = function(e) {
 			    var key = e.keyCode;
+
+			    keypressed=true;
 
 			    if (key == 37) context.fillStyle = "#333"; 			//left
 			    else if (key == 38) context.fillStyle = "#300"; 	//up
@@ -103,6 +137,7 @@
 			};
 			document.onkeyup = function(e) {
 				var key = e.keyCode;
+			    keypressed=false;
 
 			    if (key == 37) context.fillStyle = "#000"; 			//left
 			    else if (key == 38) context.fillStyle = "#000"; 	//up
@@ -113,7 +148,7 @@
 			    context.fillRect(0,0,640,480);
 
 			    return false;				
-			};*/
+			};
 			//*******Touch Events***********//
 		    canvas.addEventListener("touchstart", touchHandler, true);
 		    canvas.addEventListener("touchmove", touchHandler, true);
