@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>JS Game</title>	
+        <script src = "gameEngine.js" type = "text/javascript"></script>
+	</head>
+
+	<body>
+		<!--game container-->
+		<canvas id="gameCanvas" height="480" width="80" style="box-shadow: 0px 0px 10px #888;">
+			alternative text
+		</canvas>
+        
+	<!--game script-->
+		<script>
+			//canvas vars
+			var canvas = document.getElementById("gameCanvas");
+			var context = canvas.getContext("2d");
+			//mouse vars
+			var mousex=0, mousey=0;
+			var mouseclicks = 0;
+			var mouseclicked = false;
+			var mouseon = false;
+			var lastmousex=0, lastmousey=0;
+			//loop vars
+			var delay = 1000/60; //millisecs
+			var timer = setTimeout(update, delay);
+			//others
+			//buttons
+			var buttonX = 5;
+			var buttonClear = {x:buttonX,y:5,width:40,height:40};
+			var color = "black";
+			var buttonBlack = {x:buttonX+=45,y:5,width:40,height:40,color:"black"};
+			var buttonRed = {x:buttonX+=45,y:5,width:40,height:40,color:"red"};
+			var buttonBlue = {x:buttonX+=45,y:5,width:40,height:40,color:"blue"};
+			var buttonGreen = {x:buttonX+=45,y:5,width:40,height:40,color:"green"};
+			var colorButtons = [buttonBlack, buttonRed, buttonBlue, buttonGreen];
+			//initalize canvas window width to be starting window width
+			canvas.width = window.innerWidth - 20;
+			canvas.height = window.innerHeight - 20;
+			
+			//draw 
+			function draw(){
+				createMenu();
+
+				//button functions
+				//clear button
+				if (isPoint(buttonClear, mousex, mousey)){
+					buttonClear.draw(buttonClear, "#B6FFFF", "Clear", "Screen");
+					if (mouseclicked){
+						buttonClear.draw(buttonClear, "#FF0000", "Clear", "Screen");
+						context.clear();
+						createMenu();
+					}
+				}
+				//color buttons
+				var i;
+				for (i in colorButtons){
+					if (colorButtons[i].color == color)
+						strokeButton(colorButtons[i], "eee", "", "");
+					if (isPoint(colorButtons[i], mousex, mousey)){
+						strokeButton(colorButtons[i], "eee", "", "");
+						if (mouseclicked)
+							color = colorButtons[i].color;
+					}
+					colorButtons[i].draw();
+				}
+				
+				
+    			//drawing
+    			if (mouseclicked){
+    				
+    				context.beginPath();
+	    			context.strokeStyle = color;
+	    			context.moveTo(mousex, mousey);
+	    			if (lastmousey != 0 && lastmousex != 0)
+	    				context.lineTo(lastmousex, lastmousey);
+	    			context.stroke();
+	    			
+	    			context.fillStyle = color;
+	    			context.fillRect(mousex,mousey,1,1);
+	    		}    	
+
+	    		//how to load an image from url
+	    		//var img = new Image();
+	    		//img.src = "images/test.png";
+	    		//context.drawImage(img, 0,0,100,50);
+			};
+			
+			//menu
+			function createMenu(){
+				//menu gui
+				
+				//menubar
+				context.fillStyle = "#333";
+				context.fillRect(0,0,canvas.width, 50);
+
+				//draw buttons
+				buttonClear.draw(buttonClear, "#eee", "Clear", "Screen");
+				for (i in colorButtons)
+					colorButtons[i].draw();
+			};
+
+			//game loop
+			function update () {
+				//test
+				/*context.clear();
+				x++;
+				context.fillText("timer: "+x,10,10);
+				*/
+				draw();
+				
+				//updating lasst mouse positions
+				if (lastmousey == mousey && lastmousex == mousex){
+					lastmousey = 0;
+					lastmousex = 0;
+				}else{
+		    		lastmousey = mousey;
+		    		lastmousex = mousex;
+		    	}
+
+				//repeat or loop
+				timer = setTimeout(update, delay);
+			};
+
+			/******timer functions********/
+			function abortTimer(){
+				//stops timer
+				clearTimeout(timer);
+			};
+
+			/******helper functions*******/
+			context.clear = function(){
+				this.clearRect(0,0,canvas.width,canvas.height);	
+			};
+			//button functions
+			buttonClear.draw = strokeButton;
+			for (i in colorButtons)
+				colorButtons[i].draw = function(){fillButton(this,this.color);}
+			function strokeButton(button, color, title1, title2){
+				context.fillStyle = "#333";
+				context.fillRect(button.x, button.y,button.width, button.height);
+
+				context.strokeStyle = color;
+				context.strokeRect(button.x, button.y,button.width, button.height);
+				context.fillStyle = color;
+				context.fillText(title1, button.x + 3, button.y + 15);
+				context.fillText(title2, button.x + 3, button.y + 25);
+			};
+			function fillButton(button, color){
+				context.fillStyle = "#333";
+				context.fillRect(button.x, button.y,button.width, button.height);
+
+				context.fillStyle = color;
+				context.fillRect(button.x, button.y,button.width, button.height);
+			};
+			
+			function isPoint(obj1, x, y){
+				/*	Returns: true if point x (int), y (int) is in obj1 
+				*	precondition obj1 has properties {x:(int), y:(int), width:(int), height(int)}
+				*/
+				if (x >= obj1.x && x <= obj1.x + obj1.width)
+					if (y >= obj1.y && y <= obj1.y + obj1.height)
+						return true;
+				return false;
+			};
+			function isCollision(obj1, obj2){
+				/*	Returns: true if obj1 and obj2 intercept
+				*	precondition: obj1 and obj2 are both objects with properties
+				*					x (int)
+				*					y (int)
+				*					width (int)
+				*					height (int)
+				*/
+				var xintercept = (obj1.x >= obj2.x || obj1.x + obj1.width >= obj2.x) && 
+									(obj1.x <= obj2.x + obj2.width || obj1.x + obj1.width <= obj2.x + obj2.width);
+				var yintercept = (obj1.y >= obj2.y || obj1.y + obj1.height >= obj2.y) && 
+									(obj1.y <= obj2.y + obj2.height || obj1.y + obj1.height <= obj2.y + obj2.height);
+				if (xintercept && yintercept)
+					return true;
+
+				return false;
+			};
+
+			// capture user input
+			//*****Keyboard Events********//
+			/*
+			document.onkeydown = function(e) {
+			    var key = e.keyCode;
+
+			    if (key == 37) context.fillStyle = "#333"; 			//left
+			    else if (key == 38) context.fillStyle = "#300"; 	//up
+			    else if (key == 39) context.fillStyle = "#003"; 	//right
+			    else if (key == 40) context.fillStyle = "#030"; 	//down
+			    else return true; 
+			    
+			    context.fillRect(0,0,640,480);
+
+			    return false;
+			};
+			document.onkeyup = function(e) {
+				var key = e.keyCode;
+
+			    if (key == 37) context.fillStyle = "#000"; 			//left
+			    else if (key == 38) context.fillStyle = "#000"; 	//up
+			    else if (key == 39) context.fillStyle = "#000"; 	//right
+			    else if (key == 40) context.fillStyle = "#000"; 	//down
+			    else return true; 
+
+			    context.fillRect(0,0,640,480);
+
+			    return false;				
+			};*/
+			//*******Touch Events***********//
+		    canvas.addEventListener("touchstart", touchHandler, true);
+		    canvas.addEventListener("touchmove", touchHandler, true);
+		    canvas.addEventListener("touchend", touchHandler, true);
+		    canvas.addEventListener("touchcancel", touchHandler, true);   
+		    function touchHandler(event)
+			{
+
+				//Ignore any mapping if more than 1 fingers touching
+				if(event.changedTouches.length>1){return;}
+
+			    var touches = event.changedTouches,
+			        first = touches[0],
+			        type = "";
+			    
+			    switch(event.type)
+			    {
+			        case "touchstart": type="mousedown"; mouseclicked = true; break;
+			        case "touchmove":  type="mousemove"; break;        
+			        case "touchend":   type="mouseup"; mouseclicked = false; break;      
+			        case "touchcancel":type="mouseup"; break;
+			        default: return;
+			    }
+
+			             //initMouseEvent(type, canBubble, cancelable, view, clickCount, 
+			    //           screenX, screenY, clientX, clientY, ctrlKey, 
+			    //           altKey, shiftKey, metaKey, button, relatedTarget);
+
+			    var simulatedEvent = document.createEvent("MouseEvent");
+			    simulatedEvent.initMouseEvent(type, true, true, window, 1, 
+			                              first.screenX, first.screenY, 
+			                              first.clientX, first.clientY, false, 
+			                              false, false, false, 0/*left*/, null);
+
+			    first.target.dispatchEvent(simulatedEvent);
+			    event.preventDefault();
+			};
+			//*****Mouse Events************//
+			canvas.onmousemove = function(e){
+    			var rect = canvas.getBoundingClientRect(); 	//to make mouse positions relative to canvas
+    			mousex = e.clientX - rect.left; 
+    			mousey = e.clientY - rect.top;
+
+    			//testing
+    			// context.fillStyle = "blue";
+    			// context.fillRect(mousex,mousey,1,1);
+			};
+			canvas.onmousedown = function(e){
+    			mouseclicks ++;
+    			mouseclicked = true;
+
+    			//testing
+    			// context.fillStyle = "red";
+    			// context.fillRect(mousex,mousey,10,10);    			
+			};
+			canvas.onmouseup = function(e){
+				mouseclicked = false;
+
+    			//testing
+    			// context.fillStyle = "red";
+    			// context.fillRect(mousex,mousey,10,10);    	
+			};
+			canvas.onmouseenter = function(e){
+				mouseon = true;
+				lastmousex = e.clientX;
+				lastmousey = e.clientY;
+			};
+			canvas.onmouseout = function(e){
+				mouseon = false;
+			};
+
+		</script>
+	</body>
+
+</html>
