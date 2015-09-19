@@ -1,46 +1,191 @@
 <!DOCTYPE html>
 <html>
-<head>
-<title>Picas.co : Art of Data</title>
-</head>
 
-<body>
-	<div id = "test">
-	</div>
+	<head>
+		<title>JS Game</title>
+	</head>
 
-	<script type="text/javascript" src="http://requirejs.org/docs/release/2.1.20/minified/require.js"></script>
-	<script type="text/javascript"  src="https://sdk.amazonaws.com/js/aws-sdk-2.2.3.min.js"></script>
-	<script>const AWS_REGION = 'us-east-1';
+	<body>
+		<!--game container-->
+		<canvas id="gameCanvas" height="480" width="80" style="box-shadow: 0px 0px 10px #888;">
+			alternative text
+		</canvas>
+        
+	<!--game script-->
+		<script>
+			//canvas vars
+			var canvas = document.getElementById("gameCanvas");
+			var context = canvas.getContext("2d");
+			//loop vars
+			var delay = 1000/60; //millisecs
+			var timer = setTimeout(update, delay);
+			//others
+			//initalize canvas window width to be starting window width
+			canvas.width = window.innerWidth - 20;
+			canvas.height = window.innerHeight - 20;
+			
+			//draw 
+			function draw(){
+				//draw your things here
 
-var aws = require('aws-sdk');
-aws.config.update({
-    region: AWS_REGION
-});
-var db = new aws.DynamoDB.DocumentClient();
+				//example of a rectangle drawing
+				context.fillStyle="#FF1231"
+				context.fillRect(20,20,150,300)
 
-var params = {
-    TableName: '2012',
-    KeyConditionExpression: '#t = :ticker and #d between :date1 and :date2',
-    ExpressionAttributeNames: {
-	'#t': 'Ticker',
-	'#d': 'Date'
-    },
-    ExpressionAttributeValues: {
-	':ticker': 'COWSTOTT Index',
-	':date1': '2012-01-01',
-	':date2': '2012-12-31'
-    }
-};
+			};
 
-// db.query(params, function(err, data) {
-//     if (err)
-// 	console.log(err, err.stack);
-//     else
-// 	console.log(data);	
-// }
+			//game loop
+			function update () {
+				//test
+				/*context.clear();
+				x++;
+				context.fillText("timer: "+x,10,10);
+				*/
+				draw();
 
-document.getElementById("test").innerHTML = "akjsdh'fakljhfjkahdfkhakjf";
-</script>
-</body>
+				//repeat or loop
+				timer = setTimeout(update, delay);
+			};
+
+			/******timer functions********/
+			function abortTimer(){
+				//stops timer
+				clearTimeout(timer);
+			};
+
+			/******helper functions*******/
+			context.clear = function(){
+				this.clearRect(0,0,canvas.width,canvas.height);	
+			};
+			
+			function isPoint(obj1, x, y){
+				/*	Returns: true if point x (int), y (int) is in obj1 
+				*	precondition obj1 has properties {x:(int), y:(int), width:(int), height(int)}
+				*/
+				if (x >= obj1.x && x <= obj1.x + obj1.width)
+					if (y >= obj1.y && y <= obj1.y + obj1.height)
+						return true;
+				return false;
+			};
+			function isCollision(obj1, obj2){
+				/*	Returns: true if obj1 and obj2 intercept
+				*	precondition: obj1 and obj2 are both objects with properties
+				*					x (int)
+				*					y (int)
+				*					width (int)
+				*					height (int)
+				*/
+				var xintercept = (obj1.x >= obj2.x || obj1.x + obj1.width >= obj2.x) && 
+									(obj1.x <= obj2.x + obj2.width || obj1.x + obj1.width <= obj2.x + obj2.width);
+				var yintercept = (obj1.y >= obj2.y || obj1.y + obj1.height >= obj2.y) && 
+									(obj1.y <= obj2.y + obj2.height || obj1.y + obj1.height <= obj2.y + obj2.height);
+				if (xintercept && yintercept)
+					return true;
+
+				return false;
+			};
+
+			// capture user input
+			//*****Keyboard Events********//
+			/*
+			document.onkeydown = function(e) {
+			    var key = e.keyCode;
+
+			    if (key == 37) context.fillStyle = "#333"; 			//left
+			    else if (key == 38) context.fillStyle = "#300"; 	//up
+			    else if (key == 39) context.fillStyle = "#003"; 	//right
+			    else if (key == 40) context.fillStyle = "#030"; 	//down
+			    else return true; 
+			    
+			    context.fillRect(0,0,640,480);
+
+			    return false;
+			};
+			document.onkeyup = function(e) {
+				var key = e.keyCode;
+
+			    if (key == 37) context.fillStyle = "#000"; 			//left
+			    else if (key == 38) context.fillStyle = "#000"; 	//up
+			    else if (key == 39) context.fillStyle = "#000"; 	//right
+			    else if (key == 40) context.fillStyle = "#000"; 	//down
+			    else return true; 
+
+			    context.fillRect(0,0,640,480);
+
+			    return false;				
+			};*/
+			//*******Touch Events***********//
+		    canvas.addEventListener("touchstart", touchHandler, true);
+		    canvas.addEventListener("touchmove", touchHandler, true);
+		    canvas.addEventListener("touchend", touchHandler, true);
+		    canvas.addEventListener("touchcancel", touchHandler, true);   
+		    function touchHandler(event)
+			{
+
+				//Ignore any mapping if more than 1 fingers touching
+				if(event.changedTouches.length>1){return;}
+
+			    var touches = event.changedTouches,
+			        first = touches[0],
+			        type = "";
+			    
+			    switch(event.type)
+			    {
+			        case "touchstart": type="mousedown"; mouseclicked = true; break;
+			        case "touchmove":  type="mousemove"; break;        
+			        case "touchend":   type="mouseup"; mouseclicked = false; break;      
+			        case "touchcancel":type="mouseup"; break;
+			        default: return;
+			    }
+
+			             //initMouseEvent(type, canBubble, cancelable, view, clickCount, 
+			    //           screenX, screenY, clientX, clientY, ctrlKey, 
+			    //           altKey, shiftKey, metaKey, button, relatedTarget);
+
+			    var simulatedEvent = document.createEvent("MouseEvent");
+			    simulatedEvent.initMouseEvent(type, true, true, window, 1, 
+			                              first.screenX, first.screenY, 
+			                              first.clientX, first.clientY, false, 
+			                              false, false, false, 0/*left*/, null);
+
+			    first.target.dispatchEvent(simulatedEvent);
+			    event.preventDefault();
+			};
+			//*****Mouse Events************//
+			canvas.onmousemove = function(e){
+    			var rect = canvas.getBoundingClientRect(); 	//to make mouse positions relative to canvas
+    			mousex = e.clientX - rect.left; 
+    			mousey = e.clientY - rect.top;
+
+    			//testing
+    			// context.fillStyle = "blue";
+    			// context.fillRect(mousex,mousey,1,1);
+			};
+			canvas.onmousedown = function(e){
+    			mouseclicks ++;
+    			mouseclicked = true;
+
+    			//testing
+    			// context.fillStyle = "red";
+    			// context.fillRect(mousex,mousey,10,10);    			
+			};
+			canvas.onmouseup = function(e){
+				mouseclicked = false;
+
+    			//testing
+    			// context.fillStyle = "red";
+    			// context.fillRect(mousex,mousey,10,10);    	
+			};
+			canvas.onmouseenter = function(e){
+				mouseon = true;
+				lastmousex = e.clientX;
+				lastmousey = e.clientY;
+			};
+			canvas.onmouseout = function(e){
+				mouseon = false;
+			};
+
+		</script>
+	</body>
 
 </html>
