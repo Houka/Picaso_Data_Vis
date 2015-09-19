@@ -27,6 +27,4 @@ var params = {
 // 	console.log(data);	
 // }
 
-    document.getElementById("test").innerHTML = "akjsdh'fakljhfjkahdfkhakjf";
-
-);
+document.getElementById("test").innerHTML = "akjsdh'fakljhfjkahdfkhakjf";
