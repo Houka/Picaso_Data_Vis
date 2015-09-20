@@ -3,14 +3,17 @@
 
 	<head>
 		<title>Picas.co : Art from Data</title>
-		<h2> COWSTOTT Index - USDA Monthly Milk Production All States </h2>
+		
 	</head>
 
 	<body>
+		<h2 style="text-align:center"> C. O. W. S. T. O. T. T.</h2>
+		<h5 style="text-align:center"> An artistic representation of the USDA Monthly Milk Production All States</h5>
 		<!--game container-->
 		<canvas id="gameCanvas" height="480" width="80" style="box-shadow: 0px 0px 10px #888;">
 			alternative text
 		</canvas>
+		
         
 	<!--game script-->
 		<script>
@@ -18,7 +21,7 @@
 			var canvas = document.getElementById("gameCanvas");
 			var context = canvas.getContext("2d");
 			//loop vars
-			var delay = 1000/60; //millisecs
+			var delay = 800; //millisecs
 			var timer = setTimeout(update, delay);
 			//others
 			//mouse vars
@@ -27,58 +30,64 @@
 			var mouseclicked = false;
 			var mouseon = false;
 			var lastmousex=0, lastmousey=0;
-			var cur = 0;
+			var cur = -2;
 			var keypressed = false;
+			var flip = false;
 			//initalize canvas window width to be starting window width
-			canvas.width = window.innerWidth - 20;
+			canvas.width = window.innerWidth - 25;
 			canvas.height = window.innerHeight - 20;
 			
-				var data1 = [14614, 13530, 15206, 15047, 15697, 15087, 14978, 14896, 14260, 14611, 
+			//Introduction text in canvas
+			context.font="12px Georgia";
+			context.fillStyle="#000";
+			context.fillText("Use the left and right arrow keys to navigate the years.", canvas.width/2-157, canvas.height/2-200);
+			
+				var data2005 = [14614, 13530, 15206, 15047, 15697, 15087, 14978, 14896, 14260, 14611, 
 				14209, 14854];
 
-				var data2 = [15343, 14238, 15966, 15538, 16068, 15324, 15168, 15061, 14481, 14857, 
+				var data2006 = [15343, 14238, 15966, 15538, 16068, 15324, 15168, 15061, 14481, 14857, 
 				14523, 15231];
 
-				var data3 = [15607, 14323, 16133, 15765, 16194, 15479, 15715, 15525, 14871, 15291, 
+				var data2007 = [15607, 14323, 16133, 15765, 16194, 15479, 15715, 15525, 14871, 15291, 
 				15016, 15635];
 
-				var data4 = [15976, 15176, 16458, 16125, 16707, 15942, 15995, 15757, 15129, 15615, 
+				var data2008 = [15976, 15176, 16458, 16125, 16707, 15942, 15995, 15757, 15129, 15615, 
 				15212, 15900];
 
-				var data5 = [16135, 14754, 16485, 16148, 16805, 15935, 16018, 15737, 15038, 15420,
+				var data2009 = [16135, 14754, 16485, 16148, 16805, 15935, 16018, 15737, 15038, 15420,
 				15070, 15775];
 
-				var data6 = [16020, 14758, 16614, 16416, 17040, 16353, 16436, 16094, 15540, 15900,
+				var data2010 = [16020, 14758, 16614, 16416, 17040, 16353, 16436, 16094, 15540, 15900,
 				15498, 16150];
 
-				var data7 = [16385, 15077, 16989, 16652, 17278, 16518, 16479, 16422, 15783, 16278,
+				var data2011 = [16385, 15077, 16989, 16652, 17278, 16518, 16479, 16422, 15783, 16278,
 				15820, 16556];
 
-				var data8 = [17016, 16310, 17718, 17232, 17601, 16676, 16585, 16403, 15687, 16267, 
+				var data2012 = [17016, 16310, 17718, 17232, 17601, 16676, 16585, 16403, 15687, 16267, 
 				16008, 16821];
 
-				var data9 = [17109, 15759, 17677, 17249, 17813, 16935, 16788, 16789, 15831, 16475, 
+				var data2013 = [17109, 15759, 17677, 17249, 17813, 16935, 16788, 16789, 15831, 16475, 
 				16003, 16790]; 
 
-				var data10 =[17284, 15907, 17829, 17480, 18094, 17323, 17435];
+				var data2014 =[17284, 15907, 17829, 17480, 18094, 17323, 17435];
 
-				var all_data = [data1, data2, data3, data4, data5, data6, data7, data8, data9, data10];
+				var all_data = [data2005, data2006, data2007, data2008, data2009, data2010, data2011, data2012, data2013, data2014];
 			//draw 
 			
 			function draw(data){
 				//draw your things here
-			
-
-				context.clear();
-			
+				context.clear;
+				context.globalCompositeOperation = 'source-over';
+				context.fillRect(0,0, canvas.width, canvas.height);
+				
 				for (var i in data) { 
 					
 					context.font="40px Georgia";	
-			    	context.fillStyle="#000000";
+			    	context.fillStyle="#FFFFFF";
 			    	var str1 = "200";
-			    	if(cur+4>=10)
+			    	if(cur+5>=10)
 			    		str1 = "20";
-			    	context.fillText(str1.concat(cur+4), 25, 50);
+			    	context.fillText(str1.concat(cur+5), 25, 50);
 		    		//how to load an image from url
 		    		var img = new Image();
 		    		img.onload = function (){
@@ -102,23 +111,26 @@
 		    			if (y+h/2 > canvas.height){
 		    				y = y-h;
 		    			}
+					
 
 		    			context.globalCompositeOperation = 'xor';
 			    		context.drawImage(img, x,y,w,h);			    		
 			    		context.globalAlpha = 1;
 
-			    		context.font="16px Georgia";
-			    		context.fillStyle="#FF0000";
+			    		//context.font="16px Georgia";
+			    		//context.fillStyle="#FF0000";
 			    		
 			    		
-			    		context.fillText(data[i], x+w/3, y+h/3);
+			    		//context.fillText(data[i], x+w/3, y+h/3);
 			    		i--;
 		    		};
-
-		    		img.src = "images/cow.png";
+					if(flip)
+						img.src="images/cowflip.png";
+					else 
+						img.src = "images/cow.png";
+					
 				}
-
-
+				
 			};
 
 			//game loop
@@ -127,11 +139,6 @@
 				/*x++;
 				context.fillText("timer: "+x,10,10);
 				*/
-				if (keypressed){
-					cur = (cur+1)%10;
-					draw(all_data[cur]);
-				}
-
 				//repeat or loop
 				timer = setTimeout(update, delay);
 			};
@@ -181,12 +188,28 @@
 			    var key = e.keyCode;
 
 			    keypressed=true;
-
-			    if (key == 37) context.fillStyle = "#333"; 			//left
-			    else if (key == 38) context.fillStyle = "#300"; 	//up
-			    else if (key == 39) context.fillStyle = "#003"; 	//right
-			    else if (key == 40) context.fillStyle = "#030"; 	//down
-			    else return true; 
+				if (cur==-2)
+				{	cur=0;
+					draw(all_data[cur]);
+					context.fillStyle = "#333"; 
+				}
+			    else if (key == 37)
+				{ 
+					flip=true;
+					cur = (cur-1);
+						if(cur<0)
+							{cur=9;}
+					draw(all_data[cur]);
+					context.fillStyle = "#333";
+				}				//left
+			    else if (key == 39)
+				{
+					flip=false;
+					cur = (cur+1)%10;
+					draw(all_data[cur]);
+					context.fillStyle = "#003"; 	//right
+			    }
+				else return true; 
 			    
 			    //context.fillRect(0,0,640,480);
 
